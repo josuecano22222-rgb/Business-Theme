@@ -1,0 +1,146 @@
+/* Locally served Cairo Arabic weight subset (SIL OFL; see public/fonts/Cairo-OFL.txt).
+   Latin glyphs continue to use the InterVariable face shipped with Desk. */
+@font-face {
+	font-family: "Business Cairo";
+	src: url("/assets/business_theme/fonts/cairo-arabic-wght-normal.woff2") format("woff2");
+	font-weight: 200 1000;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0600-06FF, U+0750-077F, U+0870-089F, U+08A0-08FF, U+200C-200E,
+		U+FB50-FDFF, U+FE70-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC0-10EFF, U+1EE00-1EEFF;
+}
+
+body.bt-desk {
+	--bt-latin: "InterVariable", "Inter", "Roboto";
+	--bt-arabic: "Business Cairo", "Cairo", "Tajawal";
+	--font-stack: var(--bt-latin), var(--bt-arabic), system-ui, sans-serif;
+	--btn-primary: var(--bt-primary);
+	--bt-line: color-mix(in srgb, var(--bt-primary) 16%, var(--border-color));
+	--bt-soft: color-mix(in srgb, var(--bt-primary) 10%, var(--fg-color));
+	font-family: var(--font-stack);
+}
+
+body.bt-desk:lang(ar) {
+	--font-stack: var(--bt-arabic), var(--bt-latin), system-ui, sans-serif;
+	--text-base: 15px;
+	--weight-regular: 450;
+	font-family: var(--font-stack);
+	line-height: 1.65;
+}
+
+.bt-desk:lang(ar) :is(.widget-title, .title-text, .standard-sidebar-label) {
+	letter-spacing: normal;
+}
+
+.bt-desk .page-container {
+	background-color: var(--bg-color);
+	background-color: color-mix(in srgb, var(--bt-primary) 3%, var(--bg-color));
+}
+
+.bt-desk .navbar {
+	border-block-end: 1px solid var(--border-color);
+	border-block-end-color: var(--bt-line);
+}
+
+.bt-desk .btn.btn-primary {
+	color: var(--bt-on-primary);
+	background-color: var(--bt-primary);
+}
+
+.bt-desk :is(button, a, .form-control):focus-visible {
+	outline: 2px solid var(--bt-primary);
+	outline-offset: 2px;
+}
+
+.bt-desk .widget {
+	padding-block: var(--bt-widget-padding);
+	padding-inline: var(--bt-widget-padding);
+	border-radius: var(--bt-widget-radius);
+}
+
+.bt-desk .widget-group .widget-group-body {
+	gap: var(--bt-dashboard-gap);
+}
+
+.bt-desk .desk-sidebar {
+	--sidebar-select-color: var(--bt-soft);
+	padding-block: 0.75rem;
+	padding-inline: 0.5rem;
+}
+
+.bt-desk .desk-sidebar .standard-sidebar-item {
+	min-block-size: var(--bt-sidebar-row);
+	border-inline-start: 3px solid transparent;
+}
+
+.bt-desk .desk-sidebar .standard-sidebar-item.selected {
+	border-inline-start-color: var(--bt-primary);
+	font-weight: var(--weight-semibold);
+}
+
+[data-bt-sidebar="Minimal"] .desk-sidebar {
+	border-inline-end: 1px solid var(--border-color);
+	padding-inline-start: 0;
+}
+
+[data-bt-sidebar="Glassmorphism"] .desk-sidebar {
+	border: 1px solid var(--border-color);
+	border-radius: 1rem;
+	background-color: var(--fg-color);
+	background-image: linear-gradient(160deg,
+		color-mix(in srgb, var(--bt-sidebar-tint) 14%, transparent), transparent 75%);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+	[data-bt-sidebar="Glassmorphism"] .desk-sidebar {
+		background-color: color-mix(in srgb, var(--fg-color) 76%, transparent);
+		backdrop-filter: blur(12px);
+	}
+}
+
+[data-bt-sidebar="Floating"] .desk-sidebar {
+	margin-block: 0.5rem 1rem;
+	margin-inline: 0.25rem;
+	border: 1px solid var(--border-color);
+	border-block-start: 3px solid var(--bt-sidebar-tint);
+	border-radius: 1rem;
+	background-color: var(--fg-color);
+	box-shadow: var(--shadow-md);
+}
+
+[data-bt-sidebar="Expanded"] .desk-sidebar {
+	padding-inline: 1rem;
+	background-color: var(--subtle-fg);
+	border-radius: 0.75rem;
+}
+
+/* Leave Frappe's native mobile drawer, toggle and column order intact. */
+@media (min-width: 992px) {
+	[data-bt-sidebar="Expanded"] [data-page-route="Workspaces"] .layout-side-section {
+		flex: 0 0 24%;
+		max-inline-size: 24%;
+	}
+}
+
+.bt-preview-bar {
+	position: fixed;
+	inset-inline-end: 1rem;
+	inset-block-end: 1rem;
+	z-index: 1031;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	max-inline-size: calc(100% - 2rem);
+	padding-block: 0.5rem;
+	padding-inline: 0.875rem;
+	border: 1px solid var(--border-color);
+	border-inline-start: 3px solid var(--bt-primary);
+	border-radius: 0.75rem;
+	background: var(--fg-color);
+	color: var(--text-color);
+	box-shadow: var(--shadow-md);
+}
+
+@media print {
+	.bt-preview-bar { display: none; }
+}

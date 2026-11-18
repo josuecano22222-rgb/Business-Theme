@@ -55,6 +55,10 @@ jobs:
           node-version: 18
           check-latest: true
 
+      - name: Test Desk interactions
+        working-directory: tests/desk
+        run: npm ci && npm test
+
       - name: Cache pip
         uses: actions/cache@v4
         with:
@@ -85,7 +89,7 @@ jobs:
       - name: Setup
         run: |
           pip install frappe-bench
-          bench init --skip-redis-config-generation --skip-assets --python "$(which python)" ~/frappe-bench
+          bench init --frappe-branch v15.126.1 --skip-redis-config-generation --skip-assets --python "$(which python)" ~/frappe-bench
           mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL character_set_server = 'utf8mb4'"
           mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
 

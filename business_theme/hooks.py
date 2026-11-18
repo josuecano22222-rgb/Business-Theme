@@ -9,7 +9,6 @@ app_license = "mit"
 # ------------------
 
 # required_apps = []
-app_include_css = "/assets/business_theme/css/business_theme.css"
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -25,9 +24,10 @@ app_include_css = "/assets/business_theme/css/business_theme.css"
 # Includes in <head>
 # ------------------
 
-# include js, css files in header of desk.html
-# app_include_css = "/assets/business_theme/css/business_theme.css"
-# app_include_js = "/assets/business_theme/js/business_theme.js"
+# Desk only. Frappe resolves these names to hashed assets at boot.
+app_include_css = "business_theme.bundle.css"
+app_include_js = "business_theme.bundle.js"
+extend_bootinfo = "business_theme.business_theme.doctype.workspace_theme.workspace_theme.extend_bootinfo"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/business_theme/css/business_theme.css"
@@ -264,4 +264,3 @@ app_include_css = "/assets/business_theme/css/business_theme.css"
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-
