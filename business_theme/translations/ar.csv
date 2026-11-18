@@ -1,0 +1,43 @@
+Business Theme,سمة الأعمال
+Workspace Theme,سمة مساحة العمل
+Theme Identity,هوية السمة
+Theme Name,اسم السمة
+Default Desk Theme,السمة الافتراضية للمكتب
+Default Theme Slot,خانة السمة الافتراضية
+Use this theme for everyone in Desk. This replaces the previous default.,استخدم هذه السمة لجميع مستخدمي المكتب بدلاً من السمة الافتراضية السابقة.
+Primary Color,اللون الأساسي
+Workspace Sidebar,الشريط الجانبي لمساحة العمل
+Sidebar Style,نمط الشريط الجانبي
+Minimal,بسيط
+Glassmorphism,زجاجي
+Floating,عائم
+Expanded,موسّع
+Sidebar Density,كثافة الشريط الجانبي
+Comfortable,مريح
+Compact,مضغوط
+Spacious,فسيح
+Sidebar Tint,لون تظليل الشريط الجانبي
+Leave blank to use the primary color.,اترك الحقل فارغاً لاستخدام اللون الأساسي.
+Advanced Styling,تنسيق متقدم
+Widget and Dashboard Settings,إعدادات الودجات ولوحة المعلومات
+"Optional pixel values: widget_radius (0–32), widget_padding (4–32), dashboard_gap (4–32).",قيم اختيارية بالبكسل: widget_radius ‏(0–32) وwidget_padding ‏(4–32) وdashboard_gap ‏(4–32).
+Custom CSS,تنسيقات CSS مخصصة
+Use component rules such as .widget { border-radius: 12px; }. URLs and at-rules are not allowed.,استخدم قواعد للمكونات مثل ‎.widget { border-radius: 12px; }‎. لا يُسمح بالروابط أو القواعد التي تبدأ بعلامة @.
+Preview Theme,معاينة السمة
+Theme preview is active in this tab.,معاينة السمة مفعّلة في علامة التبويب هذه.
+End Preview,إنهاء المعاينة
+Switch to English,التبديل إلى الإنجليزية
+Switch to Arabic,التبديل إلى العربية
+Save or discard your changes before switching languages.,احفظ تغييراتك أو تجاهلها قبل تبديل اللغة.
+Widget and Dashboard Settings must be a JSON object.,يجب أن تكون إعدادات الودجات ولوحة المعلومات كائناً بصيغة JSON.
+"Supported settings are widget_radius, widget_padding and dashboard_gap.",الإعدادات المدعومة هي widget_radius وwidget_padding وdashboard_gap.
+Use a whole number from {0} to {1} for {2}.,استخدم عدداً صحيحاً من {0} إلى {1} للإعداد {2}.
+"{0} must be a six-digit hex color, such as #176b68.",يجب أن يكون {0} لوناً سداسيّاً عشريّاً من ست خانات مثل ‎#176b68‎.
+Custom CSS must be text of at most 8192 characters.,يجب أن تكون تنسيقات CSS المخصصة نصاً لا يتجاوز 8192 حرفاً.
+Only component style rules are allowed in Custom CSS (line {0}).,لا يُسمح إلا بقواعد تنسيق المكونات في CSS المخصص (السطر {0}).
+Unsupported component selector on line {0}.,محدِّد المكوّن في السطر {0} غير مدعوم.
+Unsupported CSS property or value on line {0}.,خاصية CSS أو قيمتها في السطر {0} غير مدعومة.
+Choose a supported sidebar style.,اختر نمطاً مدعوماً للشريط الجانبي.
+Choose a density available for this sidebar style.,اختر كثافة متاحة لهذا النمط من الشريط الجانبي.
+Desk access is required to load a workspace theme.,يتطلب تحميل سمة مساحة العمل صلاحية الدخول إلى المكتب.
+Theme preview settings must be a JSON object.,يجب أن تكون إعدادات معاينة السمة كائناً بصيغة JSON.

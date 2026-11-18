@@ -1,0 +1,6 @@
+{
+  "name": "business-theme-desk-tests",
+  "private": true,
+  "scripts": { "test": "node --test desk.test.cjs" },
+  "devDependencies": { "linkedom": "0.18.12" }
+}
