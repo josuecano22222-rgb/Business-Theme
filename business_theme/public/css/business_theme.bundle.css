@@ -173,3 +173,46 @@ body.bt-desk .bt-scrollable-list > .list-row-container {
 		display: none !important;
 	}
 }
+
+/* Fixed shared column tracks keep header and rows aligned during resizing. */
+body.bt-desk .bt-scrollable-list .list-row-head > .list-header-subject,
+body.bt-desk .bt-scrollable-list .list-row-head > .checkbox-actions,
+body.bt-desk .bt-scrollable-list .list-row > .level-left {
+	flex: 0 0 var(--bt-list-left-width);
+	width: var(--bt-list-left-width);
+	min-width: var(--bt-list-left-width);
+}
+body.bt-desk .bt-scrollable-list .list-row-head > .level-right,
+body.bt-desk .bt-scrollable-list .list-row > .level-right {
+	flex: 1 0 180px;
+	min-width: 180px;
+}
+body.bt-desk .bt-scrollable-list .list-header-subject > .list-row-col {
+	position: relative;
+	padding-inline-end: 12px;
+}
+body.bt-desk .bt-column-resize {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: 0;
+	width: 12px;
+	cursor: col-resize;
+	touch-action: none;
+	z-index: 1;
+}
+body.bt-desk .bt-column-resize::after {
+	content: "";
+	position: absolute;
+	inset-block: 3px;
+	inset-inline-start: 5px;
+	border-inline-start: 1px solid var(--border-color);
+}
+body.bt-desk .bt-column-resize:hover::after,
+body.bt-desk .bt-column-resize:focus-visible::after {
+	border-color: var(--primary);
+	border-inline-start-width: 2px;
+}
+body.bt-desk .bt-column-resize:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: -2px;
+}

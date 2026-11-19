@@ -42,3 +42,5 @@ Choose a density available for this sidebar style.,اختر كثافة متاح�
 Desk access is required to load a workspace theme.,يتطلب تحميل سمة مساحة العمل صلاحية الدخول إلى المكتب.
 Theme preview settings must be a JSON object.,يجب أن تكون إعدادات معاينة السمة كائناً بصيغة JSON.
 Scrollable list results,نتائج القائمة القابلة للتمرير
+Resize {0} column,تغيير عرض عمود {0}
+Drag or use arrow keys to resize; double-click or press Home to reset,اسحب أو استخدم مفاتيح الأسهم لتغيير العرض؛ انقر نقراً مزدوجاً أو اضغط Home لإعادة التعيين
