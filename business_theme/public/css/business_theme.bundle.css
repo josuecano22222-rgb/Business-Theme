@@ -146,52 +146,52 @@ body.bt-desk:lang(ar) {
 }
 
 /* The header and all rows share one scrollport, including on narrow screens. */
-body.bt-desk .result.bt-scrollable-list {
+body .result.bt-scrollable-list {
 	overflow-x: auto;
 	overscroll-behavior-inline: contain;
 }
-body.bt-desk .result.bt-scrollable-list:focus-visible {
+body .result.bt-scrollable-list:focus-visible {
 	outline: 2px solid var(--primary);
 	outline-offset: 2px;
 }
-body.bt-desk .bt-scrollable-list > .list-row-head,
-body.bt-desk .bt-scrollable-list > .list-row-container {
+body .bt-scrollable-list > .list-row-head,
+body .bt-scrollable-list > .list-row-container {
 	min-width: var(--bt-list-min-width);
 }
 @media (max-width: 767px) {
-	body.bt-desk .bt-scrollable-list .list-row-col.hidden-xs,
-	body.bt-desk .bt-scrollable-list .list-row-activity.hidden-xs,
-	body.bt-desk .bt-scrollable-list .list-liked-by-me.hidden-xs {
+	body .bt-scrollable-list .list-row-col.hidden-xs,
+	body .bt-scrollable-list .list-row-activity.hidden-xs,
+	body .bt-scrollable-list .list-liked-by-me.hidden-xs {
 		display: flex !important;
 	}
-	body.bt-desk .bt-scrollable-list .list-row-col.hide {
+	body .bt-scrollable-list .list-row-col.hide {
 		display: none !important;
 	}
 }
 @media (max-width: 767px) {
-	body.bt-desk .bt-scrollable-list .list-row .visible-xs {
+	body .bt-scrollable-list .list-row .visible-xs {
 		display: none !important;
 	}
 }
 
 /* Fixed shared column tracks keep header and rows aligned during resizing. */
-body.bt-desk .bt-scrollable-list .list-row-head > .list-header-subject,
-body.bt-desk .bt-scrollable-list .list-row-head > .checkbox-actions,
-body.bt-desk .bt-scrollable-list .list-row > .level-left {
+body .bt-scrollable-list .list-row-head > .list-header-subject,
+body .bt-scrollable-list .list-row-head > .checkbox-actions,
+body .bt-scrollable-list .list-row > .level-left {
 	flex: 0 0 var(--bt-list-left-width);
 	width: var(--bt-list-left-width);
 	min-width: var(--bt-list-left-width);
 }
-body.bt-desk .bt-scrollable-list .list-row-head > .level-right,
-body.bt-desk .bt-scrollable-list .list-row > .level-right {
+body .bt-scrollable-list .list-row-head > .level-right,
+body .bt-scrollable-list .list-row > .level-right {
 	flex: 1 0 180px;
 	min-width: 180px;
 }
-body.bt-desk .bt-scrollable-list .list-header-subject > .list-row-col {
+body .bt-scrollable-list .list-header-subject > .list-row-col {
 	position: relative;
 	padding-inline-end: 12px;
 }
-body.bt-desk .bt-column-resize {
+body .bt-column-resize {
 	position: absolute;
 	inset-block: 0;
 	inset-inline-end: 0;
@@ -200,19 +200,19 @@ body.bt-desk .bt-column-resize {
 	touch-action: none;
 	z-index: 1;
 }
-body.bt-desk .bt-column-resize::after {
+body .bt-column-resize::after {
 	content: "";
 	position: absolute;
 	inset-block: 3px;
 	inset-inline-start: 5px;
 	border-inline-start: 1px solid var(--border-color);
 }
-body.bt-desk .bt-column-resize:hover::after,
-body.bt-desk .bt-column-resize:focus-visible::after {
+body .bt-column-resize:hover::after,
+body .bt-column-resize:focus-visible::after {
 	border-color: var(--primary);
 	border-inline-start-width: 2px;
 }
-body.bt-desk .bt-column-resize:focus-visible {
+body .bt-column-resize:focus-visible {
 	outline: 2px solid var(--primary);
 	outline-offset: -2px;
 }

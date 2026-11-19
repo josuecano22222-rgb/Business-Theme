@@ -56,7 +56,7 @@ function desk(lang = "en") {
     $: () => emitter,
     __: (s) => s,
   });
-  vm.runInContext(bundle, context);
+  vm.runInContext(bundle.replace(/^import .*;$/m, ""), context);
   vm.runInContext(form, context);
   events.app_ready();
   return { frappe, theme: frappe.business_theme, document, window, events };

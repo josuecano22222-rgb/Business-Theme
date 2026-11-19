@@ -1,16 +1,13 @@
 // Adapt only Frappe v15's standard List view; native settings and permissions
 // remain the source of truth for which fields may be displayed.
 (() => {
-	const proto = frappe.views?.ListView?.prototype;
-	if (!proto || proto.__business_theme_list) return;
-	proto.__business_theme_list = true;
-
 	const MIN_WIDTH = 80;
 	const MAX_WIDTH = 800;
 	const SUBJECT_WIDTH = 240;
 	const FIELD_WIDTH = 150;
 	const ACTIVITY_WIDTH = 180;
 	const COLUMN_GAP = 15; // Frappe's .list-row-col margin
+	const TAG_MARGIN = 10; // Frappe adds an extra inline margin to the Tag column
 	let styledColumns = 0;
 
 	function column_key(column) {
@@ -79,7 +76,9 @@
 		view.columns.forEach((column, index) => {
 			const width = saved[column_key(column)] ?? default_width(column);
 			result.style.setProperty(`--bt-col-${index + 1}`, `${width}px`);
-			if (column.type !== "Tag" || view.tags_shown) leftWidth += width + COLUMN_GAP;
+			if (column.type !== "Tag" || view.tags_shown) {
+				leftWidth += width + COLUMN_GAP + (column.type === "Tag" ? TAG_MARGIN : 0);
+			}
 		});
 		result.style.setProperty("--bt-list-left-width", `${leftWidth}px`);
 		result.style.setProperty("--bt-list-min-width", `${leftWidth + ACTIVITY_WIDTH + 15}px`);
@@ -160,49 +159,92 @@
 		});
 	}
 
-	const setup_columns = proto.setup_columns;
-	proto.setup_columns = function (...args) {
-		if (this.view_name !== "List") return setup_columns.apply(this, args);
-		const settings = this.list_view_settings;
-		const limit = Number(settings?.total_fields);
-		// The native hidden Tag column is not part of the selector's field count.
-		if (Number.isInteger(limit) && limit >= 4) {
-			this.list_view_settings = { ...settings, total_fields: limit + 1 };
+	function install() {
+		const proto = frappe.views?.ListView?.prototype;
+		if (!proto || Object.prototype.hasOwnProperty.call(proto, "__business_theme_list")) return;
+		proto.__business_theme_list = true;
+
+		const setup_columns = proto.setup_columns;
+		if (typeof setup_columns === "function" && !setup_columns.__bt_wrapped) {
+			proto.setup_columns = function (...args) {
+				if (this.view_name !== "List") return setup_columns.apply(this, args);
+				const settings = this.list_view_settings;
+				const limit = Number(settings?.total_fields);
+				// The native hidden Tag column is not part of the selector's field count.
+				if (Number.isInteger(limit) && limit >= 4) {
+					this.list_view_settings = { ...settings, total_fields: limit + 1 };
+				}
+				try {
+					setup_columns.apply(this, args);
+				} finally {
+					this.list_view_settings = settings;
+				}
+				if (!this.$result) return;
+				this.$result.toggleClass("bt-scrollable-list", true);
+				this.$result.attr({ tabindex: "0", role: "region", "aria-label": __("Scrollable list results") });
+				apply_widths(this);
+			};
+			proto.setup_columns.__bt_wrapped = true;
 		}
-		try {
-			setup_columns.apply(this, args);
-		} finally {
-			this.list_view_settings = settings;
+
+		const render_header = proto.render_header;
+		if (typeof render_header === "function" && !render_header.__bt_wrapped) {
+			proto.render_header = function (...args) {
+				const result = render_header.apply(this, args);
+				if (this.view_name === "List") add_handles(this);
+				return result;
+			};
+			proto.render_header.__bt_wrapped = true;
 		}
-		if (!this.$result) return;
-		this.$result.toggleClass("bt-scrollable-list", true);
-		this.$result.attr({ tabindex: "0", role: "region", "aria-label": __("Scrollable list results") });
-		apply_widths(this);
-	};
 
-	const render_header = proto.render_header;
-	proto.render_header = function (...args) {
-		const result = render_header.apply(this, args);
-		if (this.view_name === "List") add_handles(this);
-		return result;
-	};
+		const toggle_tags = proto.toggle_tags;
+		if (typeof toggle_tags === "function" && !toggle_tags.__bt_wrapped) {
+			proto.toggle_tags = function (...args) {
+				const result = toggle_tags.apply(this, args);
+				if (this.view_name === "List") apply_widths(this);
+				return result;
+			};
+			proto.toggle_tags.__bt_wrapped = true;
+		}
 
-	const toggle_tags = proto.toggle_tags;
-	proto.toggle_tags = function (...args) {
-		const result = toggle_tags.apply(this, args);
-		if (this.view_name === "List") apply_widths(this);
-		return result;
-	};
+		const refresh_columns = proto.refresh_columns;
+		if (typeof refresh_columns === "function" && !refresh_columns.__bt_wrapped) {
+			proto.refresh_columns = async function (meta, settings) {
+				if (this.view_name !== "List") return refresh_columns.call(this, meta, settings);
+				// Rebuild query fields immediately after selecting new columns.
+				this.meta = meta;
+				this.list_view_settings = settings;
+				this.fields = [];
+				this.set_stats();
+				await this.setup_fields();
+				return refresh_columns.call(this, meta, settings);
+			};
+			proto.refresh_columns.__bt_wrapped = true;
+		}
+	}
 
-	const refresh_columns = proto.refresh_columns;
-	proto.refresh_columns = async function (meta, settings) {
-		if (this.view_name !== "List") return refresh_columns.call(this, meta, settings);
-		// Rebuild query fields immediately after selecting new columns.
-		this.meta = meta;
-		this.list_view_settings = settings;
-		this.fields = [];
-		this.set_stats();
-		await this.setup_fields();
-		return refresh_columns.call(this, meta, settings);
+	frappe.business_theme_list = {
+		version: "2",
+		install,
+		diagnostics() {
+			const view = window.cur_list;
+			const root = view?.$result?.[0];
+			return {
+				version: this.version,
+				patched: !!frappe.views?.ListView?.prototype?.__business_theme_list,
+				doctype: view?.doctype || null,
+				view: view?.view_name || null,
+				active: !!root?.classList.contains("bt-scrollable-list"),
+				handles: root?.querySelectorAll(".bt-column-resize").length || 0,
+				clientWidth: root?.clientWidth || 0,
+				scrollWidth: root?.scrollWidth || 0,
+			};
+		},
 	};
+	install();
+	// Frappe normally loads list.bundle first, but retry if another app loads
+	// or replaces the ListView class later during startup or navigation.
+	document.addEventListener("DOMContentLoaded", install, { once: true });
+	if (typeof $ === "function") $(document).on("app_ready", install);
+	frappe.router?.on?.("change", install);
 })();

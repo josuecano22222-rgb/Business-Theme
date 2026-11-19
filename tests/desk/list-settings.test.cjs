@@ -127,7 +127,7 @@ test("RTL drag and arrows follow the physical resize edge; tag width follows vis
   assert.equal(view.$result[0].style.getPropertyValue("--bt-col-1"), "250px");
   view.tags_shown = true;
   view.toggle_tags();
-  assert.equal(view.$result[0].style.getPropertyValue("--bt-list-left-width"), "925px");
+  assert.equal(view.$result[0].style.getPropertyValue("--bt-list-left-width"), "935px");
   view.render_header();
   assert.ok(!view.$result[0].querySelector(".tag-col").classList.contains("hide"));
 });
@@ -167,4 +167,28 @@ test("resize handle does not trigger header clicks and still works without stora
   saved.set = () => { throw new Error('storage blocked'); };
   assert.doesNotThrow(() => handle(view, 0).dispatchEvent(env.event('keydown', {key: 'ArrowRight'})));
   assert.equal(view.$result[0].style.getPropertyValue('--bt-col-1'), '250px');
+});
+
+test("installs after late ListView loading and can patch a replacement class on navigation", () => {
+  const { document, Event } = parseHTML('<html><head></head><body></body></html>');
+  let routeChange;
+  const frappe = {views: {}, session: {user:'alice'}, router: {on: (_event, fn) => { routeChange = fn; }}};
+  const context = vm.createContext({frappe, document, window: {location: {host:'example'}}, __: (s) => s});
+  vm.runInContext(source, context);
+  assert.equal(frappe.business_theme_list.diagnostics().patched, false);
+  class LateView { setup_columns() {} render_header() {} toggle_tags() {} refresh_columns() {} }
+  frappe.views.ListView = LateView;
+  document.dispatchEvent(new Event('DOMContentLoaded'));
+  assert.equal(frappe.business_theme_list.diagnostics().patched, true);
+  const first = LateView.prototype.setup_columns;
+  routeChange();
+  assert.equal(LateView.prototype.setup_columns, first, 'retries must not wrap twice');
+  class Inherited extends LateView {}
+  frappe.views.ListView = Inherited;
+  routeChange();
+  assert.equal(Inherited.prototype.setup_columns, first, 'inherited adapter must not be wrapped twice');
+  class Replacement { setup_columns() {} render_header() {} toggle_tags() {} refresh_columns() {} }
+  frappe.views.ListView = Replacement;
+  routeChange();
+  assert.equal(Replacement.prototype.__business_theme_list, true);
 });
