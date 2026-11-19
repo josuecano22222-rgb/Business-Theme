@@ -144,3 +144,32 @@ body.bt-desk:lang(ar) {
 @media print {
 	.bt-preview-bar { display: none; }
 }
+
+/* The header and all rows share one scrollport, including on narrow screens. */
+body.bt-desk .result.bt-scrollable-list {
+	overflow-x: auto;
+	overscroll-behavior-inline: contain;
+}
+body.bt-desk .result.bt-scrollable-list:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}
+body.bt-desk .bt-scrollable-list > .list-row-head,
+body.bt-desk .bt-scrollable-list > .list-row-container {
+	min-width: var(--bt-list-min-width);
+}
+@media (max-width: 767px) {
+	body.bt-desk .bt-scrollable-list .list-row-col.hidden-xs,
+	body.bt-desk .bt-scrollable-list .list-row-activity.hidden-xs,
+	body.bt-desk .bt-scrollable-list .list-liked-by-me.hidden-xs {
+		display: flex !important;
+	}
+	body.bt-desk .bt-scrollable-list .list-row-col.hide {
+		display: none !important;
+	}
+}
+@media (max-width: 767px) {
+	body.bt-desk .bt-scrollable-list .list-row .visible-xs {
+		display: none !important;
+	}
+}

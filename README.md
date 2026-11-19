@@ -114,3 +114,20 @@ For development, run `pre-commit install` in this checkout to enable the reposit
 ## License
 
 App code: [MIT](license.txt). The bundled unmodified Cairo Arabic weight subset is from `@fontsource-variable/cairo` 5.3.0 and is distributed under the [SIL Open Font License 1.1](business_theme/public/fonts/Cairo-OFL.txt).
+
+## Advanced DocType list settings
+
+Business Theme extends **Frappe v15's native List Settings**, rather than creating a second set of settings. A System Manager can open a DocType's **List** view, choose **Menu → List Settings**, and configure:
+
+- **Disable Count**, **Disable Comment Count**, **Disable Sidebar Stats**, and **Disable Auto Refresh**.
+- **Allow Bulk Editing** (permits the native bulk edit action for a DocType with a workflow; it does not bypass permissions or validation).
+- **Disable Automatic Recency Filters** for large tables.
+- **Maximum Number of Fields**, now 4–40, and **Fields → + Add / Remove Fields**. Select fields, drag to reorder, or use **Reset Fields** in the selector. Save both the selector and the settings dialog.
+
+The settings are **shared per DocType**, not per user. Choose the maximum *before* selecting the fields; the title and a status indicator, when present, count toward the maximum. Frappe can also append an ID column when a title field is configured. Use a reasonably small number of fields for good query and rendering performance. With an explicit maximum, the header and rows share a horizontal scrollbar; on a narrow screen, swipe sideways or focus the results region and use the arrow keys. Unconfigured lists retain Frappe's default responsive behavior. Other views and form child tables are unchanged.
+
+The native save path creates `in_list_view` Property Setters on the target DocType, so the selection affects other consumers of that metadata too. Field visibility and reads remain subject to Frappe permissions. Frappe's **Reset Fields** reads the original DocType JSON and may not work for database-only custom DocTypes. Some options, including sidebar and realtime setup, take full effect when the list is reopened or Desk is reloaded. In v15, **Disable Auto Refresh** disables realtime updates, not Frappe's separate five-minute refresh timer. Disabling the recency filter can make very large lists slower.
+
+On install and migration the app adds missing values through 40 to the `List View Settings.total_fields` options using a Property Setter, preserving existing options. This site-wide metadata extension is intentionally left in place on uninstall so saved values above 10 remain valid; to revert it, first reduce those saved values to 10 or less and then remove the `options` Property Setter for that field. Other customizations of the same Property Setter should be reviewed before removal. Run the usual `bench --site SITE migrate`, `bench build --apps business_theme` and clear-cache steps after updating.
+
+Test the Desk adapters with `cd tests/desk && npm ci && npm test`. On a v15 bench, run `bench --site SITE run-tests --module business_theme.business_theme.doctype.workspace_theme.test_list_settings` for the metadata integration tests.

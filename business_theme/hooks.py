@@ -26,7 +26,9 @@ app_license = "mit"
 
 # Desk only. Frappe resolves these names to hashed assets at boot.
 app_include_css = "business_theme.bundle.css"
-app_include_js = "business_theme.bundle.js"
+app_include_js = ["business_theme.bundle.js", "business_theme_list.bundle.js"]
+after_migrate = "business_theme.list_settings.extend_list_field_options"
+after_install = "business_theme.list_settings.extend_list_field_options"
 extend_bootinfo = "business_theme.business_theme.doctype.workspace_theme.workspace_theme.extend_bootinfo"
 
 # include js, css files in header of web template
