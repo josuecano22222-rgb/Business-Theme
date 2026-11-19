@@ -113,10 +113,12 @@
 			handle.setAttribute("aria-label", __("Resize {0} column", [label]));
 			handle.setAttribute("aria-valuemin", MIN_WIDTH);
 			handle.setAttribute("aria-valuemax", MAX_WIDTH);
-			handle.title = __("Drag or use arrow keys to resize; double-click or press Home to reset");
+			handle.title = __(
+				"Drag or use arrow keys to resize; double-click or press Home to reset"
+			);
 			const current = () => widths(view)[column_key(column)] ?? default_width(column);
 			const update_aria = () => handle.setAttribute("aria-valuenow", current());
-			const direction = () => getComputedStyle(root).direction === "rtl" ? -1 : 1;
+			const direction = () => (getComputedStyle(root).direction === "rtl" ? -1 : 1);
 			update_aria();
 			handle.addEventListener("click", (event) => event.stopPropagation());
 			handle.addEventListener("dblclick", (event) => {
@@ -129,7 +131,10 @@
 				if (!["ArrowLeft", "ArrowRight", "Home"].includes(event.key)) return;
 				event.preventDefault();
 				event.stopPropagation();
-				const delta = (event.key === "ArrowRight" ? 1 : -1) * direction() * (event.shiftKey ? 40 : 10);
+				const delta =
+					(event.key === "ArrowRight" ? 1 : -1) *
+					direction() *
+					(event.shiftKey ? 40 : 10);
 				set_width(view, column, event.key === "Home" ? null : current() + delta, true);
 				update_aria();
 			});
@@ -138,7 +143,12 @@
 				if (event.button !== 0) return;
 				event.preventDefault();
 				event.stopPropagation();
-				drag = { id: event.pointerId, x: event.clientX, width: current(), direction: direction() };
+				drag = {
+					id: event.pointerId,
+					x: event.clientX,
+					width: current(),
+					direction: direction(),
+				};
 				handle.setPointerCapture(event.pointerId);
 			});
 			handle.addEventListener("pointermove", (event) => {
@@ -181,7 +191,11 @@
 				}
 				if (!this.$result) return;
 				this.$result.toggleClass("bt-scrollable-list", true);
-				this.$result.attr({ tabindex: "0", role: "region", "aria-label": __("Scrollable list results") });
+				this.$result.attr({
+					tabindex: "0",
+					role: "region",
+					"aria-label": __("Scrollable list results"),
+				});
 				apply_widths(this);
 			};
 			proto.setup_columns.__bt_wrapped = true;

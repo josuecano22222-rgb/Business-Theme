@@ -2,7 +2,6 @@
 
 import frappe
 
-
 MAX_FIELDS = 40
 
 

@@ -19,12 +19,17 @@ class TestListSettings(FrappeTestCase):
 			"name",
 		)
 		extend_list_field_options()
-		self.assertEqual(name, frappe.db.get_value(
-			"Property Setter",
-			{"doc_type": "List View Settings", "field_name": "total_fields", "property": "options"},
-			"name",
-		))
-		self.assertEqual(options, frappe.get_meta("List View Settings").get_field("total_fields").options.split("\n"))
+		self.assertEqual(
+			name,
+			frappe.db.get_value(
+				"Property Setter",
+				{"doc_type": "List View Settings", "field_name": "total_fields", "property": "options"},
+				"name",
+			),
+		)
+		self.assertEqual(
+			options, frappe.get_meta("List View Settings").get_field("total_fields").options.split("\n")
+		)
 
 	def test_extended_select_value_passes_native_validation(self):
 		extend_list_field_options()
@@ -35,22 +40,28 @@ class TestListSettings(FrappeTestCase):
 	def test_native_settings_persist_extended_limit_and_flags(self):
 		extend_list_field_options()
 		name = "Business Theme Test " + frappe.generate_hash(length=8)
-		doc = frappe.get_doc({
-			"doctype": "List View Settings",
-			"name": name,
-			"total_fields": "25",
-			"disable_count": 1,
-			"disable_comment_count": 1,
-			"disable_sidebar_stats": 1,
-			"disable_auto_refresh": 1,
-			"allow_edit": 1,
-			"disable_automatic_recency_filters": 1,
-			"fields": '[{"fieldname":"name","label":"ID"}]',
-		}).insert()
+		doc = frappe.get_doc(
+			{
+				"doctype": "List View Settings",
+				"name": name,
+				"total_fields": "25",
+				"disable_count": 1,
+				"disable_comment_count": 1,
+				"disable_sidebar_stats": 1,
+				"disable_auto_refresh": 1,
+				"allow_edit": 1,
+				"disable_automatic_recency_filters": 1,
+				"fields": '[{"fieldname":"name","label":"ID"}]',
+			}
+		).insert()
 		saved = frappe.get_doc("List View Settings", doc.name)
 		self.assertEqual(saved.total_fields, "25")
 		for fieldname in (
-			"disable_count", "disable_comment_count", "disable_sidebar_stats", "disable_auto_refresh",
-			"allow_edit", "disable_automatic_recency_filters",
+			"disable_count",
+			"disable_comment_count",
+			"disable_sidebar_stats",
+			"disable_auto_refresh",
+			"allow_edit",
+			"disable_automatic_recency_filters",
 		):
 			self.assertEqual(saved.get(fieldname), 1)

@@ -8,10 +8,16 @@ const esbuild = require("esbuild");
 const { chromium } = require("playwright-core");
 
 const app = path.resolve(__dirname, "../../business_theme");
-const css = fs.readFileSync(path.join(app, "public/css/business_theme.bundle.css"), "utf8");
+const css = fs.readFileSync(
+  path.join(app, "public/css/business_theme.bundle.css"),
+  "utf8"
+);
 const built = esbuild.buildSync({
   entryPoints: [path.join(app, "public/js/business_theme.bundle.js")],
-  bundle: true, write: false, format: "iife", platform: "browser",
+  bundle: true,
+  write: false,
+  format: "iife",
+  platform: "browser",
 }).outputFiles[0].text;
 
 // Relevant Frappe v15 flex, list and responsive rules (Frappe is MIT licensed).
@@ -61,86 +67,150 @@ window.makeView=()=>{
 
 async function metrics(page) {
   return page.evaluate(() => {
-    const root = document.querySelector('.result');
-    const h = root.querySelector('.list-header-subject');
-    const row = root.querySelector('.list-row > .level-left');
-    const rect = (el) => { const r = el.getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; };
+    const root = document.querySelector(".result");
+    const h = root.querySelector(".list-header-subject");
+    const row = root.querySelector(".list-row > .level-left");
+    const rect = (el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right, width: r.width };
+    };
     return {
-      clientWidth: root.clientWidth, scrollWidth: root.scrollWidth,
-      h: rect(h), row: rect(row),
-      headerCells: [...h.children].map(rect), rowCells: [...row.children].map(rect),
-      handles: root.querySelectorAll('.bt-column-resize').length,
+      clientWidth: root.clientWidth,
+      scrollWidth: root.scrollWidth,
+      h: rect(h),
+      row: rect(row),
+      headerCells: [...h.children].map(rect),
+      rowCells: [...row.children].map(rect),
+      handles: root.querySelectorAll(".bt-column-resize").length,
     };
   });
 }
 
 function aligned(m) {
   m.headerCells.forEach((cell, i) => {
-    assert.ok(Math.abs(cell.left - m.rowCells[i].left) < 1, `column ${i} left edge`);
-    assert.ok(Math.abs(cell.width - m.rowCells[i].width) < 1, `column ${i} width`);
+    assert.ok(
+      Math.abs(cell.left - m.rowCells[i].left) < 1,
+      `column ${i} left edge`
+    );
+    assert.ok(
+      Math.abs(cell.width - m.rowCells[i].width) < 1,
+      `column ${i} width`
+    );
   });
 }
 
-test('built Desk bundle renders and resizes wide Frappe lists in Chromium', {skip: !process.env.CHROMIUM_PATH}, async () => {
-  const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH, args:['--no-sandbox']});
-  const page = await browser.newPage({viewport:{width:900,height:600}});
-  try {
-    await page.route('http://desk.example/**', route => route.fulfill({contentType:'text/html',body:`<!doctype html><html><head><style>${nativeCSS}</style><style>${css}</style></head><body><div class="frappe-list"><div class="result"></div></div></body></html>`}));
-    await page.goto('http://desk.example/');
-    await page.addScriptTag({content:nativeHarness});
-    // boot.business_theme and body.bt-desk are deliberately absent. The existing
-    // Desk bundle must still activate the list feature independently.
-    await page.addScriptTag({content:built});
-    await page.evaluate(() => makeView());
-    let m = await metrics(page);
-    assert.equal(m.handles, 22);
-    assert.ok(m.scrollWidth > m.clientWidth * 3, 'wide list must overflow rather than squeeze');
-    assert.equal(m.headerCells[0].width, 240);
-    assert.equal(m.headerCells[2].width, 150);
-    aligned(m);
-    assert.equal(await page.evaluate(() => frappe.business_theme_list.diagnostics().active), true);
+test(
+  "built Desk bundle renders and resizes wide Frappe lists in Chromium",
+  { skip: !process.env.CHROMIUM_PATH },
+  async () => {
+    const browser = await chromium.launch({
+      executablePath: process.env.CHROMIUM_PATH,
+      args: ["--no-sandbox"],
+    });
+    const page = await browser.newPage({
+      viewport: { width: 900, height: 600 },
+    });
+    try {
+      await page.route("http://desk.example/**", (route) =>
+        route.fulfill({
+          contentType: "text/html",
+          body: `<!doctype html><html><head><style>${nativeCSS}</style><style>${css}</style></head><body><div class="frappe-list"><div class="result"></div></div></body></html>`,
+        })
+      );
+      await page.goto("http://desk.example/");
+      await page.addScriptTag({ content: nativeHarness });
+      // boot.business_theme and body.bt-desk are deliberately absent. The existing
+      // Desk bundle must still activate the list feature independently.
+      await page.addScriptTag({ content: built });
+      await page.evaluate(() => window.makeView());
+      let m = await metrics(page);
+      assert.equal(m.handles, 22);
+      assert.ok(
+        m.scrollWidth > m.clientWidth * 3,
+        "wide list must overflow rather than squeeze"
+      );
+      assert.equal(m.headerCells[0].width, 240);
+      assert.equal(m.headerCells[2].width, 150);
+      aligned(m);
+      assert.equal(
+        await page.evaluate(
+          () => frappe.business_theme_list.diagnostics().active
+        ),
+        true
+      );
 
-    const first = page.locator('.list-header-subject .bt-column-resize').first();
-    const box = await first.boundingBox();
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2);
-    await page.mouse.up();
-    m = await metrics(page);
-    assert.equal(m.headerCells[0].width, 320);
-    aligned(m);
-    await page.evaluate(() => makeView());
-    assert.equal((await metrics(page)).headerCells[0].width, 320, 'width survives reconstruction');
-    await page.locator('.list-header-subject .bt-column-resize').first().focus();
-    await page.keyboard.press('Home');
-    assert.equal((await metrics(page)).headerCells[0].width, 240);
+      const first = page
+        .locator(".list-header-subject .bt-column-resize")
+        .first();
+      const box = await first.boundingBox();
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2);
+      await page.mouse.up();
+      m = await metrics(page);
+      assert.equal(m.headerCells[0].width, 320);
+      aligned(m);
+      await page.evaluate(() => window.makeView());
+      assert.equal(
+        (await metrics(page)).headerCells[0].width,
+        320,
+        "width survives reconstruction"
+      );
+      await page
+        .locator(".list-header-subject .bt-column-resize")
+        .first()
+        .focus();
+      await page.keyboard.press("Home");
+      assert.equal((await metrics(page)).headerCells[0].width, 240);
 
-    await page.evaluate(() => { cur_list.tags_shown = true; cur_list.toggle_tags(); });
-    m = await metrics(page);
-    aligned(m);
-    assert.ok(m.headerCells[21].right <= m.h.right + 1, 'visible tag margin must not clip last column');
+      await page.evaluate(() => {
+        cur_list.tags_shown = true;
+        cur_list.toggle_tags();
+      });
+      m = await metrics(page);
+      aligned(m);
+      assert.ok(
+        m.headerCells[21].right <= m.h.right + 1,
+        "visible tag margin must not clip last column"
+      );
 
-    await page.setViewportSize({width:360,height:600});
-    m = await metrics(page);
-    assert.ok(m.scrollWidth > m.clientWidth);
-    assert.equal(m.headerCells[2].width, 150, 'mobile columns stay visible');
-    aligned(m);
+      await page.setViewportSize({ width: 360, height: 600 });
+      m = await metrics(page);
+      assert.ok(m.scrollWidth > m.clientWidth);
+      assert.equal(m.headerCells[2].width, 150, "mobile columns stay visible");
+      aligned(m);
 
-    await page.setViewportSize({width:900,height:600});
-    await page.evaluate(() => { document.documentElement.dir = 'rtl'; makeView(); });
-    m = await metrics(page);
-    aligned(m);
-    assert.ok(m.scrollWidth > m.clientWidth);
-    const rtlHandle = page.locator('.list-header-subject .bt-column-resize').first();
-    const rtlBox = await rtlHandle.boundingBox();
-    await page.mouse.move(rtlBox.x + rtlBox.width / 2, rtlBox.y + rtlBox.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(rtlBox.x + rtlBox.width / 2 - 50, rtlBox.y + rtlBox.height / 2);
-    await page.mouse.up();
-    m = await metrics(page);
-    assert.equal(m.headerCells[0].width, 290, 'RTL dragging left expands the column');
-    aligned(m);
-  } finally {
-    await browser.close();
+      await page.setViewportSize({ width: 900, height: 600 });
+      await page.evaluate(() => {
+        document.documentElement.dir = "rtl";
+        window.makeView();
+      });
+      m = await metrics(page);
+      aligned(m);
+      assert.ok(m.scrollWidth > m.clientWidth);
+      const rtlHandle = page
+        .locator(".list-header-subject .bt-column-resize")
+        .first();
+      const rtlBox = await rtlHandle.boundingBox();
+      await page.mouse.move(
+        rtlBox.x + rtlBox.width / 2,
+        rtlBox.y + rtlBox.height / 2
+      );
+      await page.mouse.down();
+      await page.mouse.move(
+        rtlBox.x + rtlBox.width / 2 - 50,
+        rtlBox.y + rtlBox.height / 2
+      );
+      await page.mouse.up();
+      m = await metrics(page);
+      assert.equal(
+        m.headerCells[0].width,
+        290,
+        "RTL dragging left expands the column"
+      );
+      aligned(m);
+    } finally {
+      await browser.close();
+    }
   }
-});
+);
