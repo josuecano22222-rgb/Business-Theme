@@ -1,3 +1,6 @@
+// The list adapter is bundled here as well, so existing Desk hooks load it.
+import "./business_theme_list.bundle.js";
+
 // Desk boot already contains the validated presentation. No startup RPC or localStorage.
 (() => {
 	const boot = frappe.boot.business_theme;
